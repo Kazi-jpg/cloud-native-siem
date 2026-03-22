@@ -1,0 +1,16 @@
+[
+  {"name": "event_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "timestamp", "type": "TIMESTAMP", "mode": "REQUIRED"},
+  {"name": "indicator_type", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "indicator_value", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "domain", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "final_verdict", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "severity", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "vt_malicious", "type": "INTEGER", "mode": "NULLABLE"},
+  {"name": "vt_suspicious", "type": "INTEGER", "mode": "NULLABLE"},
+  {"name": "vt_harmless", "type": "INTEGER", "mode": "NULLABLE"},
+  {"name": "reputation", "type": "INTEGER", "mode": "NULLABLE"},
+  {"name": "mitre_techniques", "type": "STRING", "mode": "REPEATED"},
+  {"name": "source", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "file_name", "type": "STRING", "mode": "NULLABLE"}
+]

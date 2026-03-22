@@ -1,0 +1,4 @@
+requests
+PyYAML
+google-cloud-pubsub
+google-cloud-bigquery

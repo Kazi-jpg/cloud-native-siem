@@ -1,4 +1,9 @@
 .venv/
+.venv-1/
 __pycache__/
+
 events.jsonl
+alerts.jsonl
 config.yaml
+
+*.docx
