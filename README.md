@@ -18,7 +18,7 @@ For example, an analyst can submit a suspicious URL, review the VirusTotal engin
 
 [Open the full-size diagram](docs/architecture/architecture.svg) | [PNG version](docs/architecture/architecture.png) | [Download the editable draw.io source](docs/architecture/architecture.drawio)
 
-To edit the diagram, open the `.drawio` file in diagrams.net or the draw.io desktop application. The source contains editable shapes, text, and connectors.
+To edit the diagram, open the `.drawio` file in diagrams.net or the draw.io desktop application. Service icons are embedded, and the labels, connectors, and boundaries are editable. [Diagram sources and rebuild instructions](docs/architecture/README.md).
 
 ### How an indicator moves through the system
 
