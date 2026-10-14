@@ -1,50 +1,46 @@
 # Cloud Native SIEM
 
-A Python security analysis lab that enriches URLs and files with VirusTotal, generates normalized security events, and streams them through Google Cloud Pub/Sub into BigQuery.
+### Threat intelligence enrichment and security event analytics on Google Cloud
+
+Cloud Native SIEM is a Python security engineering project that turns a URL or file submitted by an analyst into a structured security event. It uses VirusTotal to gather threat intelligence, assigns a verdict and severity, saves the result locally, and sends the event through Google Cloud Pub/Sub to BigQuery for investigation.
+
+The project demonstrates a focused SIEM workflow: **collect an indicator, enrich it, normalize the findings, apply a detection rule, and make the resulting event searchable.** It connects a working command-line analysis tool to a cloud messaging and analytics pipeline.
+
+## What problem does it solve?
+
+A threat intelligence report contains useful findings, but investigating many reports individually makes it difficult to compare indicators or track activity over time. This project converts those findings into a consistent event schema so an analyst can review verdicts locally and query accumulated results in one place.
+
+For example, an analyst can submit a suspicious URL, review the VirusTotal engine verdicts, and produce a `HIGH` severity event if one to five engines flag it as malicious. The event is saved locally and published to Pub/Sub. A separate Python worker consumes the message and inserts the event into BigQuery, where SQL can investigate severity, observed technique IDs, and activity over time.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    analyst([Security analyst]) --> cli
-    subgraph Local[Local Python application]
-        cli[URL or file submission]
-        normalize[Normalize event and score severity]
-        rules[Explicit ATT&CK ID matching]
-        events[(events.jsonl)]
-        alerts[(alerts.jsonl)]
-        cli --> normalize
-        normalize --> events
-        normalize --> rules --> alerts
-    end
-    cli <-->|HTTPS reports and scan polling| vt[VirusTotal API]
-    subgraph GCP[Google Cloud]
-        topic[Pub/Sub · siem-events]
-        subscription[Pull subscription · siem-events-sub]
-        worker[Python subscriber]
-        warehouse[(BigQuery · security_events)]
-        topic --> subscription --> worker --> warehouse
-        worker -. ACK after insert / NACK on failure .-> subscription
-    end
-    normalize -->|JSON event| topic
-    warehouse --> queries[SQL investigation queries]
-    classDef app fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
-    classDef storage fill:#dcfce7,stroke:#16a34a,color:#14532d
-    classDef external fill:#fef3c7,stroke:#d97706,color:#78350f
-    class cli,normalize,rules,topic,subscription,worker app
-    class events,alerts,warehouse storage
-    class analyst,vt,queries external
-```
+![Cloud Native SIEM architecture showing the local analyst console, VirusTotal, Pub/Sub, a local ingestion worker, and BigQuery](docs/architecture/architecture.svg)
 
-The CLI saves events locally before attempting cloud publication. Local alerts are saved separately; the cloud pipeline carries normalized events. The subscriber acknowledges a message only after BigQuery reports a successful insert. The subscriber is a manually run Python process; this repository does not deploy a managed cloud service.
+[Open the full-size diagram](docs/architecture/architecture.svg) | [PNG version](docs/architecture/architecture.png) | [Download the editable draw.io source](docs/architecture/architecture.drawio)
 
-## Features
+To edit the diagram, open the `.drawio` file in diagrams.net or the draw.io desktop application. The source contains editable shapes, text, and connectors.
 
-- URL report lookup, with scan submission and polling when a report is missing.
-- File upload, SHA-256 hashing, and scan result retrieval.
-- Severity scoring, verdicts, and local event filtering.
-- Phishing alerts when explicit `T1566` or `T1566.002` tags are present.
-- Pub/Sub publication, BigQuery ingestion, and example investigation SQL.
+### How an indicator moves through the system
+
+1. **Submit an indicator.** The analyst enters a URL or file path in the Python console. File submissions are uploaded to VirusTotal; URL analysis first checks for an existing report.
+2. **Enrich and normalize.** The application retrieves the report and produces a common event with a unique ID, UTC timestamp, indicator, engine verdict counts, reputation, final verdict, and severity. File events also include the SHA-256 hash and filename.
+3. **Save results and evaluate the rule.** Every event is appended to `events.jsonl`. Explicit phishing technique IDs (`T1566` or `T1566.002`) generate a separate local alert in `alerts.jsonl`.
+4. **Publish the event.** The publisher sends the normalized JSON event to the `siem-events` topic. Pub/Sub makes it available through the `siem-events-sub` pull subscription.
+5. **Ingest into BigQuery.** A separately started Python worker pulls messages and inserts events into `siem_data.security_events`. It acknowledges successful inserts and negatively acknowledges failures so messages can be redelivered.
+6. **Investigate with SQL.** The included queries explore observed ATT&CK IDs, phishing-related events, activity timelines, and high-severity technique activity. Analysts can also filter saved events directly in the console.
+
+**Deployment boundary:** the analyst console and ingestion worker run as local Python processes. Pub/Sub and BigQuery are managed Google Cloud services. VirusTotal is an external API. Alerts remain local; the cloud pipeline carries security events.
+
+## What this project demonstrates
+
+| Area | Implementation |
+| --- | --- |
+| Threat intelligence integration | VirusTotal URL lookups, file uploads, scan polling, and SHA-256 hashing |
+| Security event engineering | Shared schema, UTC timestamps, unique event IDs, verdicts, and severity scoring |
+| Detection logic | Local phishing alerts based on explicit ATT&CK technique IDs |
+| Event-driven architecture | Pub/Sub separates event publication from downstream ingestion |
+| Cloud analytics | Structured BigQuery storage and SQL investigation examples |
+| Failure handling | Local save before publication; acknowledgement after successful cloud insertion |
 
 ## Run locally
 
@@ -80,7 +76,7 @@ The publishing identity needs topic publish permission. The subscriber identity 
 
 Run `python subscriber.py` in a second terminal with the same project environment variable. Then use `python main.py` to submit indicators. Optional variables are `PUBSUB_TOPIC_ID`, `PUBSUB_SUBSCRIPTION_ID`, `BQ_DATASET`, and `BQ_TABLE`. Defaults match the resource names above. Replace the project ID in `queries/mitre_queries.sql` before running its queries.
 
-## Detection logic and limits
+## Detection logic and current scope
 
 | Signal | Severity |
 | --- | --- |
@@ -89,7 +85,7 @@ Run `python subscriber.py` in a second terminal with the same project environmen
 | Suspicious verdicts without malicious verdicts | MEDIUM |
 | No malicious or suspicious verdicts | LOW |
 
-These are lab heuristics, not a guarantee of safety. VirusTotal tags are not a dependable ATT&CK mapping source: only tags already formatted as technique IDs are retained, so many events have no techniques or phishing alert. Scan polling is bounded, and API rate limits can interrupt analysis.
+This is a portfolio lab implementing a specific indicator-analysis and ingestion workflow. The severity rules are lab heuristics, not a guarantee of safety. VirusTotal tags are not a dependable ATT&CK mapping source: only tags already formatted as technique IDs are retained, so many events have no techniques or phishing alert. Scan polling is bounded, and API rate limits can interrupt analysis.
 
 Pub/Sub redelivery can produce duplicate BigQuery rows; `event_id` can be used during investigation to deduplicate. Failed publication leaves a local event but has no automatic replay. There is no dashboard, authentication layer, infrastructure-as-code deployment, or production monitoring included.
 
@@ -104,6 +100,7 @@ cloud-native-siem/
 |   |-- storage.py         # Local event and alert persistence
 |   |-- publisher.py       # Pub/Sub publisher
 |   `-- subscriber.py      # BigQuery ingestion worker
+|-- docs/architecture/     # SVG diagram and editable draw.io source
 |-- config/                # Safe configuration template
 |-- schemas/               # BigQuery table definition
 |-- queries/               # Investigation SQL

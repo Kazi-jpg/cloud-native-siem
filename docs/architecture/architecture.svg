@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc"><title id="title">Cloud Native SIEM architecture</title><desc id="desc">A local Python console enriches indicators with VirusTotal, saves events and alerts locally, and publishes events to Google Cloud Pub/Sub. A separate local Python worker pulls messages and writes to BigQuery. SQL supports investigation.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker></defs><rect width="1600" height="1120" fill="#f8fafc"/>
+<text x="48" y="52" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#2563eb" font-weight="700">CLOUD NATIVE SIEM</text>
+<text x="48" y="98" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#0f172a" font-weight="700">From suspicious indicator to searchable security event</text>
+<text x="48" y="135" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#475569" font-weight="400">VirusTotal enrichment  /  event-driven ingestion  /  BigQuery investigation</text>
+<rect x="40" y="180" width="930" height="350" rx="16" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+<text x="64" y="215" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1d4ed8" font-weight="700">LOCAL RUNTIME  /  ANALYST WORKSTATION</text>
+<rect x="70" y="250" width="240" height="130" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M86 250 H294" stroke="#2563eb" stroke-width="4"/>
+<rect x="88" y="268" width="32" height="32" rx="8" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="98" y="291" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">1</text>
+<text x="134" y="291" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">Analyst console</text>
+<text x="92" y="325" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Submit URL or file</text>
+<text x="92" y="350" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Python CLI / main.py</text>
+<rect x="410" y="250" width="520" height="130" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M426 250 H914" stroke="#2563eb" stroke-width="4"/>
+<rect x="428" y="268" width="32" height="32" rx="8" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="438" y="291" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">2</text>
+<text x="474" y="291" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">Event processing</text>
+<text x="432" y="325" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Normalize VirusTotal report / assign severity</text>
+<text x="432" y="350" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Match explicit ATT&amp;CK IDs for phishing alerts</text>
+<rect x="410" y="430" width="520" height="75" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M426 430 H914" stroke="#0d9488" stroke-width="4"/>
+<text x="432" y="471" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">Local event &amp; alert files</text>
+<text x="432" y="488" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">events.jsonl  +  alerts.jsonl</text>
+<polyline points="310,315 410,315" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="328" y="300" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Input</text>
+<polyline points="670,380 670,430" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="1010" y="180" width="550" height="350" rx="16" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+<text x="1034" y="215" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#92400e" font-weight="700">EXTERNAL THREAT INTELLIGENCE</text>
+<rect x="1045" y="250" width="480" height="130" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M1061 250 H1509" stroke="#d97706" stroke-width="4"/>
+<rect x="1063" y="268" width="32" height="32" rx="8" fill="#d97706" stroke="#d97706" stroke-width="1.5"/>
+<text x="1073" y="291" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">VT</text>
+<text x="1109" y="291" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">VirusTotal API</text>
+<text x="1067" y="325" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">URL reports / file uploads / scan polling</text>
+<text x="1067" y="350" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Engine verdicts, reputation and tags</text>
+<polyline points="930,285 1045,285" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="955" y="272" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">HTTPS</text>
+<polyline points="1045,350 930,350" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="952" y="339" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Report</text>
+<text x="1045" y="430" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Files leave the workstation for analysis.</text>
+<text x="1045" y="460" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Only submit content approved for sharing.</text>
+<rect x="40" y="600" width="1520" height="225" rx="16" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+<text x="300" y="635" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#4338ca" font-weight="700">GOOGLE CLOUD  /  MANAGED MESSAGING &amp; ANALYTICS</text>
+<rect x="80" y="670" width="320" height="125" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M96 670 H384" stroke="#2563eb" stroke-width="4"/>
+<rect x="98" y="688" width="32" height="32" rx="8" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="108" y="711" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">3</text>
+<text x="144" y="711" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">Pub/Sub topic</text>
+<text x="102" y="745" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">siem-events</text>
+<text x="102" y="770" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">JSON security events</text>
+<rect x="510" y="670" width="320" height="125" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M526 670 H814" stroke="#2563eb" stroke-width="4"/>
+<rect x="528" y="688" width="32" height="32" rx="8" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="538" y="711" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">4</text>
+<text x="574" y="711" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">Pull subscription</text>
+<text x="532" y="745" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">siem-events-sub</text>
+<text x="532" y="770" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Queues events for the worker</text>
+<rect x="1180" y="670" width="340" height="125" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M1196 670 H1504" stroke="#2563eb" stroke-width="4"/>
+<rect x="1198" y="688" width="32" height="32" rx="8" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="1208" y="711" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">6</text>
+<text x="1244" y="711" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">BigQuery</text>
+<text x="1202" y="745" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">siem_data.security_events</text>
+<text x="1202" y="770" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Structured event warehouse</text>
+<polyline points="460,505 460,565 240,565 240,670" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="70" y="554" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Publish normalized event</text>
+<polyline points="400,732 510,732" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="424" y="716" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Deliver</text>
+<rect x="40" y="870" width="650" height="180" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="64" y="906" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#0f172a" font-weight="700">DELIVERY BEHAVIOR</text>
+<text x="64" y="943" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#475569" font-weight="400">Local files are saved before cloud publication.</text>
+<text x="64" y="976" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#475569" font-weight="400">Worker ACKs after insert; failures trigger NACK.</text>
+<text x="64" y="1009" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#475569" font-weight="400">Redelivery can create duplicate BigQuery rows.</text>
+<rect x="740" y="870" width="420" height="180" rx="16" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+<text x="764" y="906" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#1d4ed8" font-weight="700">LOCAL RUNTIME  /  SEPARATE PROCESS</text>
+<rect x="765" y="925" width="370" height="100" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<path d="M781 925 H1119" stroke="#2563eb" stroke-width="4"/>
+<rect x="783" y="943" width="32" height="32" rx="8" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+<text x="793" y="966" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#ffffff" font-weight="700">5</text>
+<text x="829" y="966" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0f172a" font-weight="700">Python ingestion worker</text>
+<text x="787" y="1000" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">subscriber.py / manually started</text>
+<polyline points="670,795 670,847 720,847 720,975 765,975" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="675" y="837" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Pull</text>
+<polyline points="1120,925 1120,847 1200,847 1200,795" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1137" y="865" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Insert rows</text>
+<rect x="1210" y="870" width="350" height="180" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="1234" y="906" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#0f172a" font-weight="700">INVESTIGATE</text>
+<text x="1234" y="947" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0f172a" font-weight="700">SQL queries</text>
+<text x="1234" y="982" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569" font-weight="400">Techniques / phishing / severity</text>
+<text x="1234" y="1012" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">queries/mitre_queries.sql</text>
+<polyline points="1385,795 1385,870" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1400" y="847" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">Query</text>
+<text x="48" y="1090" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569" font-weight="400">IMPLEMENTED ARCHITECTURE  /  Python processes run locally; Pub/Sub and BigQuery are managed cloud services.</text>
+</svg>
