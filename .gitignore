@@ -7,3 +7,10 @@ alerts.jsonl
 config.yaml
 
 *.docx
+.env
+.env.*
+!.env.example
+*credentials*.json
+*service-account*.json
+*.pem
+*.key

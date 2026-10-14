@@ -9,7 +9,7 @@ ORDER BY hits DESC;
 SELECT indicator_value, timestamp
 FROM `cloud-native-siem.siem_data.security_events`,
 UNNEST(mitre_techniques) AS technique
-WHERE technique = "T1566";
+WHERE technique IN ("T1566", "T1566.002");
 
 -- MITRE activity timeline
 SELECT DATE(timestamp) as day, technique, COUNT(*) as activity_count

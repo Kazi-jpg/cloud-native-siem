@@ -23,58 +23,6 @@ def sha256_file(file_path):
             sha256.update(chunk)
     return sha256.hexdigest()
 
-def analyze_file(file_path, api_key):
-    headers = {"x-apikey": api_key}
-
-    if not os.path.exists(file_path):
-        raise Exception("File not found.")
-
-    file_size = os.path.getsize(file_path)
-
-    # VirusTotal uses a different upload flow for files over 32 MB
-    if file_size > 32 * 1024 * 1024:
-        upload_url_resp = requests.get(
-            "https://www.virustotal.com/api/v3/files/upload_url",
-            headers=headers,
-            timeout=30
-        )
-        upload_url_resp.raise_for_status()
-        upload_url = upload_url_resp.json()["data"]
-    else:
-        upload_url = "https://www.virustotal.com/api/v3/files"
-
-    with open(file_path, "rb") as f:
-        files = {"file": (os.path.basename(file_path), f)}
-        upload_resp = requests.post(upload_url, headers=headers, files=files, timeout=60)
-        upload_resp.raise_for_status()
-
-    analysis_id = upload_resp.json()["data"]["id"]
-    analysis_endpoint = f"https://www.virustotal.com/api/v3/analyses/{analysis_id}"
-
-    max_attempts = 20
-    wait_seconds = 5
-
-    for attempt in range(max_attempts):
-        analysis_response = requests.get(analysis_endpoint, headers=headers, timeout=30)
-        analysis_response.raise_for_status()
-
-        analysis_data = analysis_response.json()
-        status = analysis_data["data"]["attributes"]["status"]
-
-        print(f"VirusTotal file scan status: {status} (attempt {attempt + 1}/{max_attempts})")
-
-        if status == "completed":
-            file_hash = sha256_file(file_path)
-            file_report_endpoint = f"https://www.virustotal.com/api/v3/files/{file_hash}"
-            final_report = requests.get(file_report_endpoint, headers=headers, timeout=30)
-            final_report.raise_for_status()
-            return final_report.json(), file_hash
-
-        time.sleep(wait_seconds)
-
-    raise Exception("VirusTotal file analysis did not finish in time.")
-
-
 def url_to_id(url):
     return base64.urlsafe_b64encode(url.encode()).decode().strip("=")
 
@@ -238,13 +186,10 @@ def analyze_file(file_path, api_key):
 
     raise Exception("VirusTotal file analysis did not finish in time.")
 
-    return event
-
-
-def build_event(url, vt_report):
+def build_event(url, vt_report, indicator_type="url", file_name=None):
     # construct a basic SIEM event from a VirusTotal URL report
     parsed = urlparse(url)
-    domain = parsed.netloc or parsed.path
+    domain = (parsed.netloc or parsed.path) if indicator_type == "url" else None
     timestamp = datetime.now(timezone.utc).isoformat()
     event_id = str(uuid.uuid4())
     indicator_value = url
@@ -270,18 +215,26 @@ def build_event(url, vt_report):
     else:
         final_verdict = "Benign"
 
-    mitre_techniques = attrs.get("tags", []) if isinstance(attrs.get("tags", []), list) else []
+    tags = attrs.get("tags", [])
+    # Only retain explicit technique IDs; generic VT tags are not ATT&CK mappings.
+    import re
+    mitre_techniques = [tag for tag in tags if isinstance(tag, str) and re.fullmatch(r"T\d{4}(?:\.\d{3})?", tag)] if isinstance(tags, list) else []
 
     event = {
         "event_id": event_id,
         "timestamp": timestamp,
-        "indicator_type": "url",
+        "indicator_type": indicator_type,
         "indicator_value": indicator_value,
         "domain": domain,
         "mitre_techniques": mitre_techniques,
         "severity": severity,
         "final_verdict": final_verdict,
-        "raw_report": vt_report
+        "vt_malicious": malicious,
+        "vt_suspicious": suspicious,
+        "vt_harmless": stats.get("harmless", 0),
+        "reputation": attrs.get("reputation"),
+        "source": "virustotal",
+        "file_name": file_name
     }
 
     return event
@@ -352,6 +305,7 @@ def main():
                 print(f"\nAnalysis failed: {e}")
 
         elif choice == "2":
+            file_path = input("Enter a file path: ").strip().strip('"')
             file_path = file_path.replace("file:///", "").replace("%20", " ")
 
             try:

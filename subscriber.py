@@ -1,11 +1,12 @@
 import json
+import os
 from google.cloud import pubsub_v1
 from google.cloud import bigquery
 
-PROJECT_ID = "cloud-native-siem"
-SUBSCRIPTION_ID = "siem-events-sub"
-BQ_DATASET = "siem_data"
-BQ_TABLE = "security_events"
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "cloud-native-siem")
+SUBSCRIPTION_ID = os.getenv("PUBSUB_SUBSCRIPTION_ID", "siem-events-sub")
+BQ_DATASET = os.getenv("BQ_DATASET", "siem_data")
+BQ_TABLE = os.getenv("BQ_TABLE", "security_events")
 
 subscriber = pubsub_v1.SubscriberClient()
 subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
