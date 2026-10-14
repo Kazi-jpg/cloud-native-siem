@@ -54,7 +54,7 @@ Use Python 3.10 or newer. From the repository directory on Windows PowerShell:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-Copy-Item config.example.yaml config.yaml
+Copy-Item config/config.example.yaml config.yaml
 # Edit config.yaml and set your VirusTotal API key.
 python main.py
 ```
@@ -73,12 +73,12 @@ gcloud services enable pubsub.googleapis.com bigquery.googleapis.com
 gcloud pubsub topics create siem-events
 gcloud pubsub subscriptions create siem-events-sub --topic=siem-events
 bq --project_id=$env:GOOGLE_CLOUD_PROJECT mk --dataset siem_data
-bq --project_id=$env:GOOGLE_CLOUD_PROJECT mk --table siem_data.security_events schema.json
+bq --project_id=$env:GOOGLE_CLOUD_PROJECT mk --table siem_data.security_events schemas/schema.json
 ```
 
 The publishing identity needs topic publish permission. The subscriber identity needs subscription consume permission and BigQuery table insert permission. Resource creation additionally requires the corresponding administrative permissions.
 
-Run `python subscriber.py` in a second terminal with the same project environment variable. Then use `python main.py` to submit indicators. Optional variables are `PUBSUB_TOPIC_ID`, `PUBSUB_SUBSCRIPTION_ID`, `BQ_DATASET`, and `BQ_TABLE`. Defaults match the resource names above. Replace the project ID in `mitre_queries.sql` before running its queries.
+Run `python subscriber.py` in a second terminal with the same project environment variable. Then use `python main.py` to submit indicators. Optional variables are `PUBSUB_TOPIC_ID`, `PUBSUB_SUBSCRIPTION_ID`, `BQ_DATASET`, and `BQ_TABLE`. Defaults match the resource names above. Replace the project ID in `queries/mitre_queries.sql` before running its queries.
 
 ## Detection logic and limits
 
@@ -95,13 +95,25 @@ Pub/Sub redelivery can produce duplicate BigQuery rows; `event_id` can be used d
 
 ## Repository guide
 
-| File | Purpose |
-| --- | --- |
-| `main.py` | Interactive analysis, normalization, detection, local storage |
-| `publisher.py` | Publish JSON events to Pub/Sub |
-| `subscriber.py` | Consume events and insert into BigQuery |
-| `schema.json` | BigQuery event schema |
-| `mitre_queries.sql` | ATT&CK-oriented investigation examples |
-| `config.example.yaml` | Safe local configuration template |
+```text
+cloud-native-siem/
+|-- siem/                  # Application code
+|   |-- cli.py             # Menu and analysis workflow
+|   |-- events.py          # Normalization and detection rules
+|   |-- virustotal.py      # VirusTotal integration
+|   |-- storage.py         # Local event and alert persistence
+|   |-- publisher.py       # Pub/Sub publisher
+|   `-- subscriber.py      # BigQuery ingestion worker
+|-- config/                # Safe configuration template
+|-- schemas/               # BigQuery table definition
+|-- queries/               # Investigation SQL
+|-- tests/                 # Offline regression checks
+|-- main.py                # Start the console
+|-- subscriber.py          # Start the ingestion worker
+|-- requirements.txt
+`-- README.md
+```
+
+Run commands from the repository root. Your private `config.yaml` and generated JSONL logs stay local. Personal Word documents (`.doc`, `.docx`, and `.dox`) are excluded from GitHub.
 
 Run offline checks with `python -m unittest discover -s tests -v`. These checks do not contact VirusTotal or Google Cloud.

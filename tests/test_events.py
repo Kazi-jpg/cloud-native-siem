@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import unittest
 
-from main import build_event, detect_mitre_threat
+from siem.events import build_event, detect_mitre_threat
 
 
 class EventTests(unittest.TestCase):
@@ -19,7 +19,7 @@ class EventTests(unittest.TestCase):
 
     def test_file_event_matches_bigquery_schema(self):
         event = build_event("a" * 64, self.report(), indicator_type="file_hash", file_name="sample.txt")
-        schema = json.loads(Path("schema.json").read_text())
+        schema = json.loads((Path(__file__).resolve().parents[1] / "schemas" / "schema.json").read_text())
         self.assertEqual(set(event), {field["name"] for field in schema})
         self.assertIsNone(event["domain"])
         self.assertEqual(event["file_name"], "sample.txt")

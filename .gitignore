@@ -6,7 +6,11 @@ events.jsonl
 alerts.jsonl
 config.yaml
 
-*.docx
+# Keep personal Word documents out of GitHub (including mixed-case extensions).
+*.[dD][oO][cC]
+*.[dD][oO][cC][xX]
+*.[dD][oO][xX]
+~$*
 .env
 .env.*
 !.env.example
